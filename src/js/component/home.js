@@ -30,11 +30,10 @@ export function Home() {
 				console.log("Fetch Error :-S", err);
 			});
 	}, []);
-	// let newTask = new taskCreator(inputValue, false);
-	const addTodo = input => {
+	const sendTodos = input => {
 		fetch("https://assets.breatheco.de/apis/fake/todos/user/pizza", {
 			method: "PUT",
-			body: JSON.stringify(todoList),
+			body: JSON.stringify(input),
 			headers: {
 				"Content-Type": "application/json"
 			}
@@ -53,6 +52,13 @@ export function Home() {
 				//error handling
 				console.log(error);
 			});
+	};
+	const addTodo = e => {
+		const currentTodoList = [...todoList];
+		const newTodo = { label: inputValue, done: false };
+		setTodoList([...currentTodoList, newTodo]);
+		sendTodos(todoList);
+		setInputValue("");
 	};
 	const deleteTodo = indexToRemove => {
 		let alteredList = todoList.filter((value, i) => i != indexToRemove);
@@ -78,8 +84,7 @@ export function Home() {
 						type="button"
 						id="button-addon2"
 						onClick={() => {
-							addTodo(inputValue);
-							setInputValue("");
+							addTodo({ label: inputValue, done: false });
 						}}>
 						Add Todo
 					</button>
