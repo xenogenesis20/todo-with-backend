@@ -9,19 +9,16 @@ export function Home() {
 	useEffect(() => {
 		fetch("https://assets.breatheco.de/apis/fake/todos/user/pizza")
 			.then(function(response) {
-				if (response.status !== 200) {
-					console.log(
-						"Looks like there was a problem. Status Code: " +
-							response.status
-					);
-					return;
+				if (!response.ok) {
+					throw Error(response.statusText);
 				}
-				response.json().then(function(data) {
-					setTodoList(data);
-					console.log(data);
-				});
-			}, [])
-
+				// Read the response as json.
+				return response.json();
+			})
+			.then(function(responseAsJson) {
+				// Do stuff with the JSON
+				setTodoList(responseAsJson);
+			})
 			.catch(function(err) {
 				console.log("Fetch Error :-S", err);
 			});
@@ -39,11 +36,28 @@ export function Home() {
 				console.log(resp.ok); // will be true if the response is successfull
 				console.log(resp.status); // the status code = 200 or code = 400 etc.
 				console.log(resp.text()); // will try return the exact result as string
+				console.log(resp);
+
 				return resp.json(); // (returns promise) will try to parse the result as json as return a promise that you can .then for results
 			})
 			.then(data => {
 				//here is were your code should start after the fetch finishes
 				console.log(data); //this will print on the console the exact object received from the server
+				fetch("https://assets.breatheco.de/apis/fake/todos/user/pizza")
+					.then(function(response) {
+						if (!response.ok) {
+							throw Error(response.statusText);
+						}
+						// Read the response as json.
+						return response.json();
+					})
+					.then(function(responseAsJson) {
+						// Do stuff with the JSON
+						setTodoList(responseAsJson);
+					})
+					.catch(function(err) {
+						console.log("Fetch Error :-S", err);
+					});
 			})
 			.catch(error => {
 				//error handling
@@ -60,8 +74,22 @@ export function Home() {
 	};
 	const deleteTodo = indexToRemove => {
 		let alteredList = todoList.filter((value, i) => i != indexToRemove);
-		setTodoList(alteredList);
 		sendTodos(alteredList);
+		fetch("https://assets.breatheco.de/apis/fake/todos/user/pizza")
+			.then(function(response) {
+				if (!response.ok) {
+					throw Error(response.statusText);
+				}
+				// Read the response as json.
+				return response.json();
+			})
+			.then(function(responseAsJson) {
+				// Do stuff with the JSON
+				setTodoList(responseAsJson);
+			})
+			.catch(function(err) {
+				console.log("Fetch Error :-S", err);
+			});
 	};
 
 	const markDone = indexToAlter => {
