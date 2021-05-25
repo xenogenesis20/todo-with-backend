@@ -3,13 +3,9 @@ import React, { useState, useEffect } from "react";
 export function Home() {
 	const [inputValue, setInputValue] = useState("");
 	const [todoList, setTodoList] = useState([{ label: "", done: false }]);
-	console.log("Here is the initial list", todoList);
+	// console.log("Here is the initial list", todoList);
 
-	function taskCreator(theLabel, isDone) {
-		this.label = theLabel;
-		this.done = isDone;
-	}
-
+	// get todo list from API
 	useEffect(() => {
 		fetch("https://assets.breatheco.de/apis/fake/todos/user/pizza")
 			.then(function(response) {
@@ -24,12 +20,13 @@ export function Home() {
 					setTodoList(data);
 					console.log(data);
 				});
-			})
+			}, [])
 
 			.catch(function(err) {
 				console.log("Fetch Error :-S", err);
 			});
 	}, []);
+	// send current list to API
 	const sendTodos = input => {
 		fetch("https://assets.breatheco.de/apis/fake/todos/user/pizza", {
 			method: "PUT",
@@ -53,16 +50,32 @@ export function Home() {
 				console.log(error);
 			});
 	};
+
 	const addTodo = e => {
 		const currentTodoList = [...todoList];
 		const newTodo = { label: inputValue, done: false };
 		setTodoList([...currentTodoList, newTodo]);
-		sendTodos(todoList);
+		sendTodos([...currentTodoList, newTodo]);
 		setInputValue("");
 	};
 	const deleteTodo = indexToRemove => {
 		let alteredList = todoList.filter((value, i) => i != indexToRemove);
 		setTodoList(alteredList);
+		sendTodos(alteredList);
+	};
+
+	const markDone = indexToAlter => {
+		// let markedDone = todoList.filter((value, i) => i == indexToAlter);
+		let updatedTasks = todoList.map((value, i) => {
+			if (i == indexToAlter) {
+				value.done = !value.done;
+				return value;
+			} else {
+				return value;
+			}
+		});
+		setTodoList(updatedTasks);
+		sendTodos(updatedTasks);
 	};
 
 	return (
@@ -94,8 +107,21 @@ export function Home() {
 				<div className="col-12">
 					{todoList.map((item, i) => {
 						return (
-							<div key={i}>
-								{item.label} - {item.done.toString()}
+							<div
+								key={i}
+								className="d-flex justify-content-between">
+								<div>
+									{item.label} -{" "}
+									{item.done ? "done" : "not done"}
+								</div>
+								<div>
+									<i
+										onClick={e => markDone(i)}
+										className="fas fa-check"></i>
+									<i
+										onClick={() => deleteTodo(i)}
+										className="fas fa-trash ml-auto"></i>
+								</div>
 							</div>
 						);
 					})}
